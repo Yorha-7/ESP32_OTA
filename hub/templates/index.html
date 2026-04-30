@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OTA Hub - ESP32 Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .node {
+            background: #f8f9fa;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 4px;
+        }
+        .node.pending {
+            border-left-color: #ffc107;
+        }
+        .node.offline {
+            border-left-color: #dc3545;
+            opacity: 0.7;
+        }
+        .node-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .label {
+            font-weight: bold;
+            color: #666;
+        }
+        .btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #0056b3;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .upload-form {
+            background: #e9ecef;
+            padding: 20px;
+            border-radius: 8px;
+        }
+        .upload-form input, .upload-form select {
+            padding: 10px;
+            margin: 5px 0;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        .badge-success {
+            background: #28a745;
+            color: white;
+        }
+        .badge-warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .badge-danger {
+            background: #dc3545;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>ESP32 OTA Hub</h1>
+    
+    <div class="card">
+        <h2>Connected Nodes</h2>
+        {% if not nodes %}
+            <p>No nodes connected yet.</p>
+        {% else %}
+            {% for node_id, node in nodes.items() %}
+            <div class="node {% if node.get('pending_update') %}pending{% endif %} {% if node.get('status') == 'offline' %}offline{% endif %}">
+                <div class="node-info">
+                    <div><span class="label">Node ID:</span> {{ node_id }}</div>
+                    <div><span class="label">Version:</span> {{ node.get('version', 'unknown') }}</div>
+                    <div><span class="label">Status:</span> 
+                        {% if node.get('status') == 'offline' %}
+                        <span class="badge badge-danger">Offline</span>
+                        {% else %}
+                        <span class="badge badge-success">Online</span>
+                        {% endif %}
+                    </div>
+                    <div><span class="label">Last Seen:</span> {{ node.get('last_seen', 'never') }}</div>
+                    {% if node.get('pending_update') %}
+                    <div><span class="label">Pending:</span> <span class="badge badge-warning">{{ node.get('pending_version') }}</span></div>
+                    {% endif %}
+                </div>
+                <div style="margin-top: 10px;">
+                    <a href="/api/firmware/{{ node_id }}" class="btn" target="_blank">Download Firmware</a>
+                </div>
+            </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2>Upload Firmware</h2>
+        <form method="POST" action="/upload" enctype="multipart/form-data" class="upload-form">
+            <label>Select Node:</label>
+            <select name="node_id" required>
+                {% for node_id in nodes.keys() %}
+                <option value="{{ node_id }}">{{ node_id }}</option>
+                {% endfor %}
+                <option value="new">New Node (enter below)</option>
+            </select>
+            
+            <label>Node ID (if new):</label>
+            <input type="text" name="new_node_id" placeholder="node-001">
+            
+            <label>Firmware Version:</label>
+            <input type="text" name="version" placeholder="1.0.0" required>
+            
+            <label>Select Firmware (.bin):</label>
+            <input type="file" name="firmware" accept=".bin" required>
+            
+            <button type="submit" class="btn">Upload & Schedule Update</button>
+        </form>
+    </div>
+    
+    <div class="card">
+        <h2>Quick Actions</h2>
+        <a href="/upload" class="btn">Upload Firmware</a>
+        <a href="/" class="btn">Refresh Page</a>
+    </div>
+</body>
+</html>
