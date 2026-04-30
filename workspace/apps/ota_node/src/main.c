@@ -6,7 +6,7 @@
 #include "ota.h"
 
 // WiFi credentials
-#define WIFI_SSID     "as Zero"
+#define WIFI_SSID     "Zero"
 #define WIFI_PSK      "abcdefgh"
 
 // ======================================================

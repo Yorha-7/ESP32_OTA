@@ -104,7 +104,7 @@ The server runs at `http://raspberrypi.local:5000`
 Edit in `ota_node/src/main.c`:
 
 ```c
-#define WIFI_SSID     "as Zero"
+#define WIFI_SSID     "Zero"
 #define WIFI_PSK     "abcdefgh"
 ```
 
