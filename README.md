@@ -193,4 +193,12 @@ Flash size varies based on your code (typically 200KB-1MB)
 
 ## License
 
-MIT
+IIT Dholakpur
+
+## Problems
+
+here are some problems that i listed by reading the ota code:
+
+1. the OTA will update only when firmware updates from v0.1 to v0.2, it has no clue what comes after that, also it will not load older versions if we try that.
+2. its using a meta data that will remain intact even after the new flash, that is used as pointer, thats too noob. but also i dont know myself how to do it better.
+3. by now my room must have been a trash can (prototypes lying on floor) but its clean. yes that is a problem.
